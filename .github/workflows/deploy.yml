@@ -11,12 +11,15 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Downloads/app
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,7 +28,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
+          cache-dependency-path: Downloads/app/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -33,10 +37,10 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: ./Downloads/app/dist
 
   deploy:
     needs: build
